@@ -1,0 +1,42 @@
+{
+  "name": "bolt-settings",
+  "version": "0.0.1",
+  "description": "Default settings app for Bolt",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chieze-Franklin/bolt-settings"
+  },
+  "author": "Chieze Franklin",
+  "bugs": {
+    "url": "https://github.com/Chieze-Franklin/bolt-settings/issues"
+  },
+  "homepage": "https://chieze-franklin.github.io/bolt-settings",
+  "dependencies": {
+    "body-parser": "^1.9.3",
+    "express": "^4.10.2"
+  },
+  "keywords": [
+    "bolt",
+    "settings",
+    "bolt-settings"
+  ],
+
+  "bolt": {
+    "title": "Settings",
+    "main": "bolt_server.js",
+    "icon": "icon.png",
+    "index": "/index",
+    "ini": "/api/ini",
+    "install": "/api/install",
+    "startup": true,
+    "tags": [ "settings" ],
+    "checks": [ "package.json" ],
+    "files": {
+        "icon": "icon.png"
+    },
+    "plugins": {
+        "/settings": "/"
+    }
+  }
+}
