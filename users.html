@@ -53,16 +53,16 @@
             <ul>
               {{#each users}}
               <li class="chat-user-list clearfix">
-                <a data-view-animation="push-parrallax" data-view-port="#chat" class="" href="/users/{{username}}">
+                <a data-view-animation="push-parrallax" data-view-port="#chat" class="" href="/users/{{name}}">
                   <p class="p-l-10 col-xs-height col-middle col-xs-12 text-master">
-                    {{username}} 
-                    <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="deleteUser('{{username}}')">Delete</a>
+                    {{displayName}} 
+                    <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="deleteUser('{{name}}')">Delete</a>
                     {{#if isBlocked}}
-                      <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="unblockUser('{{username}}')">Unblock</a>
+                      <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="unblockUser('{{name}}')">Unblock</a>
                     {{else}}
-                      <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="blockUser('{{username}}')">Block</a>
+                      <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="blockUser('{{name}}')">Block</a>
                     {{/if}}
-                    <a type="submit" id="login-btn" class="btn btn-primary pull-right" href="/users/roles/{{username}}">Roles...</a>
+                    <a type="submit" id="login-btn" class="btn btn-primary pull-right" href="/users/roles/{{name}}">Roles...</a>
                   </p>
                 </a>
               </li>

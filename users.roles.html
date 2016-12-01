@@ -51,7 +51,7 @@
           <br />
           <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="select_role">
             {{#each roles}}
-            <option>{{title}}</option>
+            <option value="{{name}}">{{displayName}}</option>
             {{/each}}
           </select>
 
@@ -100,7 +100,8 @@
     $(document).ready(function(){
       $("#add_role").click(function(){
           var user = "{{username}}";
-          var role = $("#select_role option:selected").text(); //or $("#select_role").find(":selected").text()
+          var role = $("#select_role option:selected").val(); //or $("#select_role").find(":selected").text()
+          console.log({ user: user, role: role });
           //TODO: ensure role is not empty
           $.ajax({
             url: "{{protocol}}://{{host}}:{{bolt_port}}/api/user-roles",
@@ -124,7 +125,6 @@
     });
 
     function deleteUserRole(role) {
-      var user = "{{username}}";
       $.ajax({
         url: "{{protocol}}://{{host}}:{{bolt_port}}/api/user-roles?user={{username}}&role=" + role,
         type: "DELETE",

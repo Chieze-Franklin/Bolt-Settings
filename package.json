@@ -23,7 +23,7 @@
   ],
 
   "bolt": {
-    "title": "Settings",
+    "displayName": "Settings",
     "main": "bolt_server.js",
     "icon": "icon.png",
     "index": "/index",
@@ -36,7 +36,7 @@
         "icon": "icon.png"
     },
     "plugins": {
-        "/settings": "/"
+        "/settings": "/index"
     }
   }
 }

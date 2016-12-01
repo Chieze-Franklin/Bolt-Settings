@@ -3,6 +3,7 @@ var cons = require('consolidate');
 var express = require('express');
 var fs = require('fs');
 var superagent = require('superagent');
+var session = require("client-sessions"/*"express-session"*/);
 
 //---helpers
 var appPort, boltProtocol, boltHost, boltPort, boltReqid;
@@ -49,7 +50,7 @@ app.get('/index', function (req, res) {
         if(users && users.length > 0) user = users[0]; 
         var title = "Settings (no logged in user)";
         if(user){
-          title = "Settings (currently logged in as " + user.username + ")";
+          title = "Settings (currently logged in as " + user.displayName + ")";
         }
 
         var scope = {
@@ -62,7 +63,7 @@ app.get('/index', function (req, res) {
           bolt_port: boltPort,
           reqid: boltReqid,
 
-          username: user.username
+          username: user.name
         };
         res
           .set('Content-type', 'text/html')
@@ -70,19 +71,21 @@ app.get('/index', function (req, res) {
       });
   }
   else {
-    var scope = {
-      title: "Settings",
-      sub_title: "Settings (no logged in user)",
-      version: "Demo Version",
-
-      protocol: boltProtocol,
-      host: boltHost,
-      bolt_port: boltPort,
-      reqid: boltReqid
-    };
-    res
-      .set('Content-type', 'text/html')
-      .render('index.html', scope);
+    //var scope = {
+    //  title: "Settings",
+    //  sub_title: "Settings (no logged in user)",
+    //  version: "Demo Version",
+//
+    //  protocol: boltProtocol,
+    //  host: boltHost,
+    //  bolt_port: boltPort,
+    //  reqid: boltReqid
+    //};
+    //res
+    //  .set('Content-type', 'text/html')
+    //  .render('index.html', scope);
+    var success = encodeURIComponent(boltProtocol + '://' + boltHost + ':' + appPort + '/index');
+    res.redirect(boltProtocol + '://' + boltHost + ':' + boltPort + '/login?success=' + success);
   }
 });
 
@@ -237,11 +240,9 @@ app.get('/users/:username', function (req, res) {
       if(user){
         scope = {
           title: "Settings",
-          sub_title: user.username,
+          sub_title: user.name,
 
-          username: user.username,
-          bolcked: user.isBlocked,
-          visits: user.visits
+          user: user
         };
       }
         

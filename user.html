@@ -45,7 +45,7 @@
             <div class="row">
               <div class="col-sm-12">
                 <div class="form-group form-group-default">
-                  <label>Visits: {{visits}}</label>
+                  <label>{{user.displayName}}</label>
                 </div>
               </div>
             </div>
@@ -53,7 +53,15 @@
             <div class="row">
               <div class="col-sm-12">
                 <div class="form-group form-group-default">
-                  <label>Blocked: {{bolcked}}</label>
+                  <label>Visits: {{user.visits}}</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group form-group-default">
+                  <label>Blocked: {{user.isBlocked}}</label>
                 </div>
               </div>
             </div>
