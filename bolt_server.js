@@ -41,13 +41,14 @@ app.post('/api/ini', function (req, res) { //Bolt will send needed info to this 
 });
 
 app.get('/index', function (req, res) {
-  if (req.query.userid) {
+  if (req.query.user) {
     superagent
-      .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/users?_id=' + req.query.userid)
+      .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/users/@current')
+      .set('X-Bolt-Req-Id', boltReqid)
+      .set('X-Bolt-User-Token', req.query.user)
       .end(function(error, usersResponse){
         //TODO: check error and usersResponse.body.error
-        var user, users = usersResponse.body.body;
-        if(users && users.length > 0) user = users[0]; 
+        var user = usersResponse.body.body; 
         var title = "Settings (no logged in user)";
         if(user){
           title = "Settings (currently logged in as " + user.displayName + ")";
