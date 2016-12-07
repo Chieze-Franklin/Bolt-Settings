@@ -94,9 +94,9 @@ app.get('/apps', function (req, res) {
   //get registered apps
   superagent
     .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/apps')
-    .end(function(error, usersResponse){
-      //TODO: check error and usersResponse.body.error
-      var apps = usersResponse.body.body;
+    .end(function(error, appsResponse){
+      //TODO: check error and appsResponse.body.error
+      var apps = appsResponse.body.body;
 
       var scope = {
         title: "Settings",
@@ -107,6 +107,46 @@ app.get('/apps', function (req, res) {
       res
         .set('Content-type', 'text/html')
         .render('apps.html', scope);
+    });
+});
+
+app.get('/apps/add', function (req, res) {
+  var scope = {
+    title: "Settings",
+    sub_title: "New App",
+
+    protocol: boltProtocol,
+    host: boltHost,
+    bolt_port: boltPort,
+    my_port: appPort,
+
+    reqid: boltReqid
+  };
+  res
+    .set('Content-type', 'text/html')
+    .render('apps.add.html', scope);
+});
+
+app.get('/apps/:name', function (req, res) {
+  //get app
+  superagent
+    .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/apps/' + req.params.name)
+    .end(function(error, appResponse){
+      //TODO: check error and appResponse.body.error
+      var app = appResponse.body.body;
+      var scope;
+      if(app){
+        scope = {
+          title: "Settings",
+          sub_title: app.displayName,
+
+          app: app
+        };
+      }
+        
+      res
+        .set('Content-type', 'text/html')
+        .render('app.html', scope);
     });
 });
 
@@ -233,14 +273,14 @@ app.get('/users/:username', function (req, res) {
   //get user
   superagent
     .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/users/' + req.params.username)
-    .end(function(error, usersResponse){
-      //TODO: check error and usersResponse.body.error
-      var user = usersResponse.body.body;
+    .end(function(error, userResponse){
+      //TODO: check error and userResponse.body.error
+      var user = userResponse.body.body;
       var scope;
       if(user){
         scope = {
           title: "Settings",
-          sub_title: user.name,
+          sub_title: user.displayName,
 
           user: user
         };
