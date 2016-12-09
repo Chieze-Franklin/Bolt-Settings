@@ -30,11 +30,13 @@
     "ini": "/api/ini",
     "install": "/api/install",
     "startup": true,
+    "system": true,
     "tags": [ "settings" ],
     "checks": [ "package.json" ],
     "files": {
         "icon": "icon.png"
     },
+    "public": ["icon.png"],
     "plugins": {
         "/settings": "/index"
     }

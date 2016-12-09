@@ -103,29 +103,19 @@ app.get('/apps', function (req, res) {
         title: "Settings",
         sub_title: "Apps",
 
+        protocol: boltProtocol,
+        host: boltHost,
+        bolt_port: boltPort,
+        my_port: appPort,
+
+        reqid: boltReqid,
+
         apps: apps
       };
       res
         .set('Content-type', 'text/html')
         .render('apps.html', scope);
     });
-});
-
-app.get('/apps/add', function (req, res) {
-  var scope = {
-    title: "Settings",
-    sub_title: "New App",
-
-    protocol: boltProtocol,
-    host: boltHost,
-    bolt_port: boltPort,
-    my_port: appPort,
-
-    reqid: boltReqid
-  };
-  res
-    .set('Content-type', 'text/html')
-    .render('apps.add.html', scope);
 });
 
 app.get('/apps/:name', function (req, res) {
@@ -141,6 +131,13 @@ app.get('/apps/:name', function (req, res) {
           title: "Settings",
           sub_title: app.displayName,
 
+          protocol: boltProtocol,
+          host: boltHost,
+          bolt_port: boltPort,
+          my_port: appPort,
+
+          reqid: boltReqid,
+
           app: app
         };
       }
@@ -148,6 +145,56 @@ app.get('/apps/:name', function (req, res) {
       res
         .set('Content-type', 'text/html')
         .render('app.html', scope);
+    });
+});
+
+app.get('/apps-add', function (req, res) {
+  var scope = {
+    title: "Settings",
+    sub_title: "New App",
+
+    protocol: boltProtocol,
+    host: boltHost,
+    bolt_port: boltPort,
+    my_port: appPort,
+
+    reqid: boltReqid
+  };
+  res
+    .set('Content-type', 'text/html')
+    .render('apps-add.html', scope);
+});
+
+app.get('/apps-sideload/:path', function (req, res) {
+  superagent
+    .post(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/apps/reg-package')
+    .send({ path: req.params.path })
+    .end(function(error, response){
+      //TODO: check error and response.body.error
+      var package = response.body.body;
+
+      if(package){
+        var scope = {
+          title: "Settings",
+          sub_title: "Sideload App",
+
+          path: req.params.path,
+          displayName: package.bolt.displayName || package.name,
+          startup: package.bolt.startup || false,
+          system: package.bolt.system || false,
+
+          protocol: boltProtocol,
+          host: boltHost,
+          bolt_port: boltPort,
+          my_port: appPort,
+          
+          reqid: boltReqid
+        };
+      }
+
+      res
+        .set('Content-type', 'text/html')
+        .render('apps-sideload.html', scope);
     });
 });
 
@@ -164,6 +211,13 @@ app.get('/roles', function (req, res) {
         title: "Settings",
         sub_title: "Roles",
 
+        protocol: boltProtocol,
+        host: boltHost,
+        bolt_port: boltPort,
+        my_port: appPort,
+
+        reqid: boltReqid,
+
         roles: roles
       };
       res
@@ -172,7 +226,7 @@ app.get('/roles', function (req, res) {
     });
 });
 
-app.get('/roles/add', function (req, res) {
+app.get('/roles-add', function (req, res) {
   var scope = {
     title: "Settings",
     sub_title: "New Role",
@@ -186,7 +240,7 @@ app.get('/roles/add', function (req, res) {
   };
   res
     .set('Content-type', 'text/html')
-    .render('roles.add.html', scope);
+    .render('roles-add.html', scope);
 });
 
 //-----------------users
@@ -218,7 +272,7 @@ app.get('/users', function (req, res) {
     });
 });
 
-app.get('/users/add', function (req, res) {
+app.get('/users-add', function (req, res) {
   var scope = {
     title: "Settings",
     sub_title: "New User",
@@ -232,7 +286,7 @@ app.get('/users/add', function (req, res) {
   };
   res
     .set('Content-type', 'text/html')
-    .render('users.add.html', scope);
+    .render('users-add.html', scope);
 });
 
 app.get('/users/roles/:username', function (req, res) {
@@ -265,7 +319,7 @@ app.get('/users/roles/:username', function (req, res) {
           };
           res
             .set('Content-type', 'text/html')
-            .render('users.roles.html', scope);
+            .render('users-roles.html', scope);
         });
     });
 });
@@ -282,6 +336,13 @@ app.get('/users/:username', function (req, res) {
         scope = {
           title: "Settings",
           sub_title: user.displayName,
+
+          protocol: boltProtocol,
+          host: boltHost,
+          bolt_port: boltPort,
+          my_port: appPort,
+
+          reqid: boltReqid,
 
           user: user
         };
