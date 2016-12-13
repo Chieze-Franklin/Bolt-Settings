@@ -63,6 +63,7 @@ app.get('/index', function (req, res) {
           host: boltHost,
           bolt_port: boltPort,
           reqid: boltReqid,
+          my_name: "bolt-settings",
 
           username: user.name
         };
@@ -172,6 +173,7 @@ app.get('/apps-sideload/:path', function (req, res) {
     .end(function(error, response){
       //TODO: check error and response.body.error
       var package = response.body.body;
+      //TODO: show package.bolt.dependencies
 
       if(package){
         var scope = {
