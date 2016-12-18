@@ -22,8 +22,7 @@ app.use('/api', function (request, response, next) {
   next();
 });
 
-app.use('**/assets', express.static(__dirname + '/assets'));
-app.use('**/pages', express.static(__dirname + '/pages'));
+app.use('**/public', express.static(__dirname + '/public'));
 
 app.set('views', __dirname);
 app.engine('html', cons.handlebars);

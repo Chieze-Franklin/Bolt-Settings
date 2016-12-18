@@ -55,7 +55,7 @@
               <li class="chat-user-list clearfix">
                 <a data-view-animation="push-parrallax" data-view-port="#chat" class="" href="/users/{{name}}">
                   <p class="p-l-10 col-xs-height col-middle col-xs-12 text-master">
-                    {{displayName}} 
+                    <img src="{{../protocol}}://{{../host}}:{{../bolt_port}}/{{displayPic}}" width="32" height="32"> {{displayName}} 
                     <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="deleteUser('{{name}}')">Delete</a>
                     {{#if isBlocked}}
                       <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="unblockUser('{{name}}')">Unblock</a>
