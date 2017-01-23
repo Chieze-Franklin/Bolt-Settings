@@ -1,0 +1,48 @@
+<div class="register-container full-height sm-p-t-30">
+  <div class="container-sm-height full-height">
+    <div class="row row-sm-height">
+      <div class="col-sm-12 col-sm-height col-middle">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group form-group-default">
+              <label>App</label>
+              <input type="text" name="app" id="app" placeholder="app name (download) or path (sideload)" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-cons m-t-10" name="download" id="download">Download</button>
+        <button class="btn btn-primary btn-cons m-t-10" name="sideload" id="sideload">Sideload</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function(){
+    var appname, apppath;
+    $("#download").click(function(){
+        appname=$("#app").val();
+        $.ajax({
+          url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/apps/get",
+          data: { name: appname },
+          type: "POST",
+          headers: {'X-Bolt-Req-Id': '{{bolt.reqid}}'},
+          success: function(response, status, xhr){
+            if(response.code == 0){
+              window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/apps";
+            }
+            else {
+              //TODO: error
+              console.log(response);
+            }
+          },
+          error: function(xhr, status, err){}
+        });
+    });
+
+    $("#sideload").click(function(){
+        apppath = $("#app").val();
+        window.location.href = "/apps-sideload/" + apppath;
+    });
+  });
+</script>

@@ -1,0 +1,25 @@
+<div class="view-port clearfix" id="chat">
+  <div class="view bg-white">
+    <div data-init-list-view="ioslist" class="list-view boreded no-top-border">
+      <div class="list-view-group-container">
+      <a type="submit" id="login-btn" class="btn btn-success" href="/apps-add">New App</a>
+        <ul>
+          {{#each apps}}
+          <li class="chat-user-list clearfix">
+            <a data-view-animation="push-parrallax" data-view-port="#chat" class="" href="/apps/{{name}}">
+              <p class="p-l-10 col-xs-height col-middle col-xs-12 text-master">
+                <img src="{{../bolt.protocol}}://{{../bolt.host}}:{{../bolt.port}}/files/{{name}}/icon" width="20" height="20">
+                {{displayName}} 
+                <a type="submit" id="login-btn" class="btn btn-danger pull-right" href="/apps/uninstall/{{name}}"><i class="fa fa-trash-o"></i></a>
+                <span class="pull-right">
+                  &nbsp;&nbsp;<a type="submit" id="login-btn" class="btn btn-primary" href="/apps/update/{{name}}"><i class="fa fa-refresh"></i> Update</a>&nbsp;&nbsp;
+                </span>
+              </p>
+            </a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

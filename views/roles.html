@@ -1,0 +1,62 @@
+<div class="view-port clearfix" id="chat">
+  <div class="view bg-white">
+    <div data-init-list-view="ioslist" class="list-view boreded no-top-border">
+      <div class="list-view-group-container">
+      <a type="submit" id="login-btn" class="btn btn-success" href="/roles-add">New Role</a>
+        <ul>
+          {{#each roles}}
+          <li class="chat-user-list clearfix">
+            <a data-view-animation="push-parrallax" data-view-port="#chat" class="" href="/roles/{{name}}">
+              <p class="p-l-10 col-xs-height col-middle col-xs-12 text-master">
+                {{displayName}} |
+                Admin: {{#if isAdmin}}True{{else}}False{{/if}} |
+                {{description}}
+                <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="deleteRole('{{name}}', '{{displayName}}')"><i class="fa fa-trash-o"></i></a>
+                <span class="pull-right">
+                  &nbsp;&nbsp;<a type="submit" id="login-btn" class="btn btn-primary" href="/roles/edit/{{name}}"><i class="fa fa-pencil-square-o"></i> Edit</a>&nbsp;&nbsp;
+                </span>
+              </p>
+            </a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function deleteRole(name, displayName) {
+  var doJob = function() {
+    $.ajax({
+      url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/roles/" + name,
+      type: "DELETE",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+      },
+      success: function(response, status, xhr){
+        if(response.code == 0){
+          swal("Role deleted!", displayName + " has been deleted!", "success");
+          window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/roles";
+        }
+        else {
+          swal(response.errorUserTitle, response.errorUserMessage, "error");
+        }
+      },
+      error: function(xhr, status, err){
+        alert(xhr.responseText);
+      }
+    });
+  }
+  swal({
+    title: "Delete " + displayName + "?",
+    text: displayName + " will be deleted from this system!",
+    type: "warning",
+    showCancelButton: true,
+    closeOnConfirm: false
+  }, function(isConfirm){
+    if (isConfirm) {
+      doJob();
+    }
+  });
+}
+</script>

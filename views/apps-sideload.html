@@ -1,0 +1,63 @@
+<div class="register-container full-height sm-p-t-30">
+  <div class="container-sm-height full-height">
+    <div class="row row-sm-height">
+      <div class="col-sm-12 col-sm-height col-middle">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="checkbox check-success checkbox-circle">
+              {{#if startup}}
+              <input name="startup" id="startup" type="checkbox" checked>
+              {{else}}
+              <input name="startup" id="startup" type="checkbox">
+              {{/if}}
+              <label for="startup">Start this app as soon as Bolt starts (even before a user is logged in)</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="checkbox check-success checkbox-circle">
+              {{#if system}}
+              <input name="system" id="system" type="checkbox" checked>
+              {{else}}
+              <input name="system" id="system" type="checkbox">
+              {{/if}}
+              <label for="system">Grant this app root privilege (do this for only apps you trust)</label>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-cons m-t-10" name="submit" id="submit">Install</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function(){
+    var startup, system;
+    $("#submit").click(function(){
+        startup = $("#startup").is(":checked");
+        system = $("#system").is(":checked");
+
+        $.ajax({
+          url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/apps/reg",
+          data: { path: "{{path}}", startup: startup, system: system },
+          type: "POST",
+          headers: {'X-Bolt-Req-Id': '{{reqid}}'},
+          success: function(response, status, xhr){
+            if(response.code == 0){
+              sweetAlert("App installed!", response.body.displayName + " has been installed!", "success");
+              window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/apps";
+            }
+            else {
+              swal(response.errorUserTitle, response.errorUserMessage, "error");
+            }
+          },
+          error: function(xhr, status, err){
+            alert(xhr.responseText);
+          }
+        });
+    });
+  });
+</script>

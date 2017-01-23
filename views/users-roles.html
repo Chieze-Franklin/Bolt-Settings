@@ -1,0 +1,96 @@
+<div class="view-port clearfix" id="chat">
+  <div class="view bg-white">
+    <div data-init-list-view="ioslist" class="list-view boreded no-top-border">
+      <br />
+      {{#if rolesHasElements}}
+      <select class="cs-select cs-skin-slide" data-init-plugin="cs-select" id="select_role">
+        {{#each roles}}
+        <option value="{{name}}">{{displayName}}</option>
+        {{/each}}
+      </select>
+
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn btn-primary btn-cons m-t-10" name="add_role" id="add_role"><i class="fa fa-plus"></i> Add</button></span>
+      {{/if}}
+        
+      <div class="list-view-group-container">
+        <ul>
+          {{#each userRoles}}
+          <li class="chat-user-list clearfix">
+            <a data-view-animation="push-parrallax" data-view-port="#chat" class="" href="/roles/{{role}}">
+              <p class="p-l-10 col-xs-height col-middle col-xs-12 text-master">
+                {{roleInfo.displayName}} 
+                <a id="login-btn" class="btn btn-danger pull-right" onclick="deleteUserRole('{{role}}', '{{roleInfo.displayName}}')"><i class="fa fa-trash-o"></i></a>
+              </p>
+            </a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function(){
+  $("#add_role").click(function(){
+      var user = "{{username}}";
+      var role = $("#select_role option:selected").val(); //or $("#select_role").find(":selected").text()
+      console.log({ user: user, role: role });
+      //TODO: ensure role is not empty
+      $.ajax({
+        url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/user-roles",
+        data: { user: user, role: role },
+        type: "POST",
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+        },
+        success: function(response, status, xhr){
+          if(response.code == 0){
+            swal("Role added!", displayName + " has been added to this user's list of roles!", "success");
+            window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/users/roles/{{username}}";
+          }
+          else {
+            swal(response.errorUserTitle, response.errorUserMessage, "error");
+          }
+        },
+        error: function(xhr, status, err){
+          alert(xhr.responseText);
+        }
+      });
+  });
+});
+
+function deleteUserRole(role, displayName) {
+  var doJob = function() {
+    $.ajax({
+      url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/user-roles?user={{username}}&role=" + role,
+      type: "DELETE",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+      },
+      success: function(response, status, xhr){
+        if(response.code == 0){
+          swal("Role deleted!", displayName + " has been deleted from this user's list of roles!", "success");
+          window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/users/roles/{{username}}";
+        }
+        else {
+          swal(response.errorUserTitle, response.errorUserMessage, "error");
+        }
+      },
+      error: function(xhr, status, err){
+        alert(xhr.responseText);
+      }
+    });
+  }
+  swal({
+    title: "Delete " + displayName + "?",
+    text: displayName + " will be deleted from this user's list of roles!",
+    type: "warning",
+    showCancelButton: true,
+    closeOnConfirm: false
+  }, function(isConfirm){
+    if (isConfirm) {
+      doJob();
+    }
+  });
+}
+</script>

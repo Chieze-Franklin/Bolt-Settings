@@ -1,0 +1,77 @@
+<div class="register-container full-height sm-p-t-30">
+  <div class="container-sm-height full-height">
+    <div class="row row-sm-height">
+      <div class="col-sm-12 col-sm-height col-middle">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group form-group-default">
+              <label>Role name</label>
+              <input type="text" name="title" id="title" placeholder="must be unique in the system" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group form-group-default">
+              <label>Role Description</label>
+              <input type="text" name="description" id="description" placeholder="simple description" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="checkbox check-success checkbox-circle">
+              <input name="isadmin" id="isadmin" type="checkbox">
+              <label for="isadmin">Is Admin</label>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-cons m-t-10" name="submit" id="submit">Create new role</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(function()
+{
+  //$('#form-register').validate()
+})
+$(document).ready(function(){
+    var title, description, isadmin;
+    $("#submit").click(function(){
+        title=$("#title").val();
+        description=$("#description").val();
+        isadmin=$("#isadmin").is(":checked");
+        var name = title.toLowerCase();
+        while (name.indexOf(" ") > -1 || name.indexOf("/") > -1 || name.indexOf("\\") > -1 || name.indexOf("?") > -1) {
+          name = name.replace(" ", "-").replace("/", "-").replace("\\", "-").replace("?", "-");
+        }
+        /*
+        * Perform some validation here.
+        */
+        $.ajax({
+          url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/roles",
+          data: { name: name, displayName: title, description: description, isAdmin: isadmin },
+          type: "POST",
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+          },
+          success: function(response, status, xhr){
+            if(response.code == 0){
+              sweetAlert("Role created!", response.body.displayName + " has been created!", "success");
+              window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/roles";
+            }
+            else {
+              sweetAlert(response.errorUserTitle, response.errorUserMessage, "error");
+            }
+          },
+          error: function(xhr, status, err){
+            alert(xhr.responseText);
+          }
+        });
+    });
+  });
+</script>

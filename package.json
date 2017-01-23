@@ -24,13 +24,13 @@
 
   "bolt": {
     "displayName": "Settings",
-    "main": "bolt_server.js",
-    "index": "/index",
+    "main": "bolt-server.js",
+    "index": "/",
     "ini": "/api/ini",
     "install": "/api/install",
     "startup": true,
     "system": true,
-    "tags": [ "settings" ],
+    "tags": [ "main", "settings" ],
     "checks": [ "package.json" ],
     "files": {
         "icon": "ico/icon.png",
@@ -38,7 +38,11 @@
     },
     "public": ["ico"],
     "extensions": {
-        "/settings": "/index"
+        "/settings": "/"
+    },
+    "dependencies": {
+      "bolt-ui-pages": "*",
+      "bolt-ui-sweetalert": "*"
     }
   }
 }

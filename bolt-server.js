@@ -1,12 +1,18 @@
 var bodyParser = require('body-parser');
-var cons = require('consolidate');
+var exphbs = require('express3-handlebars');
 var express = require('express');
 var fs = require('fs');
 var superagent = require('superagent');
 var session = require("client-sessions"/*"express-session"*/);
 
 //---helpers
-var appPort, boltProtocol, boltHost, boltPort, boltReqid;
+var __app = {
+  displayName: "Settings",
+  name: "bolt-settings"
+};
+var __bolt = {};
+var __user;
+var __year = new Date().getFullYear();
 
 var app = express();
 app.use(bodyParser.json());
@@ -22,49 +28,43 @@ app.use('/api', function (request, response, next) {
   next();
 });
 
-app.use('**/public', express.static(__dirname + '/public'));
+app.use('**/assets', express.static(__dirname + '/assets'));
 
-app.set('views', __dirname);
-app.engine('html', cons.handlebars);
+app.set('views', __dirname + '/views');
+app.engine('html', exphbs.create({
+  defaultLayout: 'main.html',
+  layoutsDir: app.get('views') + '/layouts',
+  partialsDir: [app.get('views') + '/partials']
+}).engine);
 app.set('view engine', 'html');
 
 //----------initializers
 app.post('/api/ini', function (req, res) { //Bolt will send needed info to this endpoint
-  appPort = req.body.appPort,
-  boltProtocol = req.body.protocol,
-  boltHost = req.body.host;
-  boltPort = req.body.port;
-  boltReqid = req.body.reqid;
+  __app.port = req.body.appPort,
+  __bolt.protocol = req.body.protocol,
+  __bolt.host = req.body.host;
+  __bolt.port = req.body.port;
+  __bolt.reqid = req.body.reqid;
 
   res.send();
 });
 
-app.get('/index', function (req, res) {
+app.get('/', function (req, res) {
   if (req.query.user) {
     superagent
-      .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/users/@current')
-      .set('X-Bolt-Req-Id', boltReqid)
+      .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/users/@current')
+      .set('X-Bolt-Req-Id', __bolt.reqid)
       .set('X-Bolt-User-Token', req.query.user)
       .end(function(error, usersResponse){
         //TODO: check error and usersResponse.body.error
-        var user = usersResponse.body.body; 
-        var title = "Settings (no logged in user)";
-        if(user){
-          title = "Settings (currently logged in as " + user.displayName + ")";
-        }
+        __user = usersResponse.body.body; 
+        if (__user && !__user.displayPic) __user.displayPic = 'public/bolt/users/user.png';
 
         var scope = {
-          title: "Settings",
-          sub_title: title,
-          version: "Demo Version",
-
-          protocol: boltProtocol,
-          host: boltHost,
-          bolt_port: boltPort,
-          reqid: boltReqid,
-          my_name: "bolt-settings",
-
-          username: user.name
+          app: __app,
+          bolt:  __bolt,
+          user: __user,
+          year: __year
         };
         res
           .set('Content-type', 'text/html')
@@ -72,21 +72,8 @@ app.get('/index', function (req, res) {
       });
   }
   else {
-    //var scope = {
-    //  title: "Settings",
-    //  sub_title: "Settings (no logged in user)",
-    //  version: "Demo Version",
-//
-    //  protocol: boltProtocol,
-    //  host: boltHost,
-    //  bolt_port: boltPort,
-    //  reqid: boltReqid
-    //};
-    //res
-    //  .set('Content-type', 'text/html')
-    //  .render('index.html', scope);
-    var success = encodeURIComponent(boltProtocol + '://' + boltHost + ':' + appPort + '/index');
-    res.redirect(boltProtocol + '://' + boltHost + ':' + boltPort + '/login?success=' + success);
+    var success = encodeURIComponent(__bolt.protocol + '://' + __bolt.host + ':' + __app.port);
+    res.redirect(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/login?success=' + success);
   }
 });
 
@@ -94,21 +81,18 @@ app.get('/index', function (req, res) {
 app.get('/apps', function (req, res) {
   //get registered apps
   superagent
-    .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/apps')
+    .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/apps')
     .end(function(error, appsResponse){
       //TODO: check error and appsResponse.body.error
       var apps = appsResponse.body.body;
 
       var scope = {
-        title: "Settings",
-        sub_title: "Apps",
+        app: __app,
+        bolt:  __bolt,
+        user: __user,
+        year: __year,
 
-        protocol: boltProtocol,
-        host: boltHost,
-        bolt_port: boltPort,
-        my_port: appPort,
-
-        reqid: boltReqid,
+        section: "Apps (" + apps.length + ")",
 
         apps: apps
       };
@@ -121,24 +105,21 @@ app.get('/apps', function (req, res) {
 app.get('/apps/:name', function (req, res) {
   //get app
   superagent
-    .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/apps/' + req.params.name)
+    .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/apps/' + req.params.name)
     .end(function(error, appResponse){
       //TODO: check error and appResponse.body.error
       var app = appResponse.body.body;
       var scope;
       if(app){
         scope = {
-          title: "Settings",
-          sub_title: app.displayName,
+          app: __app,
+          bolt:  __bolt,
+          user: __user,
+          year: __year,
 
-          protocol: boltProtocol,
-          host: boltHost,
-          bolt_port: boltPort,
-          my_port: appPort,
+          section: app.displayName,
 
-          reqid: boltReqid,
-
-          app: app
+          boltApp: app
         };
       }
         
@@ -150,15 +131,12 @@ app.get('/apps/:name', function (req, res) {
 
 app.get('/apps-add', function (req, res) {
   var scope = {
-    title: "Settings",
-    sub_title: "New App",
+    app: __app,
+    bolt:  __bolt,
+    user: __user,
+    year: __year,
 
-    protocol: boltProtocol,
-    host: boltHost,
-    bolt_port: boltPort,
-    my_port: appPort,
-
-    reqid: boltReqid
+    section: "Add App"
   };
   res
     .set('Content-type', 'text/html')
@@ -167,7 +145,7 @@ app.get('/apps-add', function (req, res) {
 
 app.get('/apps-sideload/:path', function (req, res) {
   superagent
-    .post(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/apps/reg-package')
+    .post(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/apps/reg-package')
     .send({ path: req.params.path })
     .end(function(error, response){
       //TODO: check error and response.body.error
@@ -175,21 +153,22 @@ app.get('/apps-sideload/:path', function (req, res) {
       //TODO: show package.bolt.dependencies
 
       if(package){
+        var startup = false;
+        if (package.bolt.startup) startup = package.bolt.startup;
+        var system = false;
+        if (package.bolt.system) system = package.bolt.system;
         var scope = {
-          title: "Settings",
-          sub_title: "Sideload App",
+          app: __app,
+          bolt:  __bolt,
+          user: __user,
+          year: __year,
+
+          section: "Sideload " + (package.bolt.displayName || package.name),
 
           path: req.params.path,
           displayName: package.bolt.displayName || package.name,
-          startup: package.bolt.startup || false,
-          system: package.bolt.system || false,
-
-          protocol: boltProtocol,
-          host: boltHost,
-          bolt_port: boltPort,
-          my_port: appPort,
-          
-          reqid: boltReqid
+          startup: startup,
+          system: system,
         };
       }
 
@@ -203,21 +182,18 @@ app.get('/apps-sideload/:path', function (req, res) {
 app.get('/roles', function (req, res) {
   //get registered roles
   superagent
-    .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/roles')
+    .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/roles')
     .end(function(error, usersResponse){
       //TODO: check error and usersResponse.body.error
       var roles = usersResponse.body.body;
 
       var scope = {
-        title: "Settings",
-        sub_title: "Roles",
+        app: __app,
+        bolt:  __bolt,
+        user: __user,
+        year: __year,
 
-        protocol: boltProtocol,
-        host: boltHost,
-        bolt_port: boltPort,
-        my_port: appPort,
-
-        reqid: boltReqid,
+        section: "Roles (" + roles.length + ")",
 
         roles: roles
       };
@@ -229,19 +205,43 @@ app.get('/roles', function (req, res) {
 
 app.get('/roles-add', function (req, res) {
   var scope = {
-    title: "Settings",
-    sub_title: "New Role",
+    app: __app,
+    bolt:  __bolt,
+    user: __user,
+    year: __year,
 
-    protocol: boltProtocol,
-    host: boltHost,
-    bolt_port: boltPort,
-    my_port: appPort,
-
-    reqid: boltReqid
+    section: "Add Role"
   };
   res
     .set('Content-type', 'text/html')
     .render('roles-add.html', scope);
+});
+
+app.get('/roles/:name', function (req, res) {
+  //get role
+  superagent
+    .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/roles/' + req.params.name)
+    .end(function(error, userResponse){
+      //TODO: check error and userResponse.body.error
+      var role = userResponse.body.body;
+      var scope;
+      if(role){
+        scope = {
+          app: __app,
+          bolt:  __bolt,
+          user: __user,
+          year: __year,
+
+          section: role.displayName,
+
+          role: role
+        };
+      }
+        
+      res
+        .set('Content-type', 'text/html')
+        .render('role.html', scope);
+    });
 });
 
 //-----------------users
@@ -249,21 +249,18 @@ app.get('/roles-add', function (req, res) {
 app.get('/users', function (req, res) {
   //get registered users
   superagent
-    .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/users')
+    .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/users')
     .end(function(error, usersResponse){
       //TODO: check error and usersResponse.body.error
       var users = usersResponse.body.body;
 
       var scope = {
-        title: "Settings",
-        sub_title: "Users",
+        app: __app,
+        bolt:  __bolt,
+        user: __user,
+        year: __year,
 
-        protocol: boltProtocol,
-        host: boltHost,
-        bolt_port: boltPort,
-        my_port: appPort,
-        
-        reqid: boltReqid,
+        section: "Users (" + users.length + ")",
 
         users: users
       };
@@ -275,15 +272,12 @@ app.get('/users', function (req, res) {
 
 app.get('/users-add', function (req, res) {
   var scope = {
-    title: "Settings",
-    sub_title: "New User",
+    app: __app,
+    bolt:  __bolt,
+    user: __user,
+    year: __year,
 
-    protocol: boltProtocol,
-    host: boltHost,
-    bolt_port: boltPort,
-    my_port: appPort,
-
-    reqid: boltReqid
+    section: "Add User"
   };
   res
     .set('Content-type', 'text/html')
@@ -293,28 +287,39 @@ app.get('/users-add', function (req, res) {
 app.get('/users/roles/:username', function (req, res) {
   //get user's roles
   superagent
-    .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/user-roles?user=' + req.params.username)
+    .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/user-roles?user=' + req.params.username)
     .end(function(error, userRolesResponse){
       //TODO: check error and userRolesResponse.body.error
       var userRoles = userRolesResponse.body.body;
 
       superagent
-        .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/roles')
+        .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/roles')
         .end(function(rolesError, rolesResponse){
           var roles = rolesResponse.body.body;
-
+          var indicesToRem = [];
+          for(var a = 0; a < userRoles.length; a++) {
+            for (var b = 0; b < roles.length; b++) {
+              if (userRoles[a].role == roles[b].name) {
+                userRoles[a].roleInfo = roles[b];
+                indicesToRem.push(b);
+                break;
+              }
+            }
+          }
+          for(var a = indicesToRem.length - 1; a > -1; --a) {
+            roles.splice(indicesToRem[a], 1);
+          }
+          
           var scope = {
-            title: "Settings",
-            sub_title: "Roles for " + req.params.username,
+            app: __app,
+            bolt:  __bolt,
+            user: __user,
+            year: __year,
 
-            protocol: boltProtocol,
-            host: boltHost,
-            bolt_port: boltPort,
-            my_port: appPort,
-
-            reqid: boltReqid,
+            section: "User's Roles",
 
             roles: roles,
+            rolesHasElements: (roles.length > 0),
             userRoles: userRoles,
             username: req.params.username
           };
@@ -328,24 +333,21 @@ app.get('/users/roles/:username', function (req, res) {
 app.get('/users/:username', function (req, res) {
   //get user
   superagent
-    .get(boltProtocol + '://' + boltHost + ':' + boltPort + '/api/users/' + req.params.username)
+    .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/users/' + req.params.username)
     .end(function(error, userResponse){
       //TODO: check error and userResponse.body.error
       var user = userResponse.body.body;
       var scope;
       if(user){
         scope = {
-          title: "Settings",
-          sub_title: user.displayName,
+          app: __app,
+          bolt:  __bolt,
+          user: __user,
+          year: __year,
 
-          protocol: boltProtocol,
-          host: boltHost,
-          bolt_port: boltPort,
-          my_port: appPort,
+          section: user.displayName,
 
-          reqid: boltReqid,
-
-          user: user
+          boltUser: user
         };
       }
         

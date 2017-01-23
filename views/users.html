@@ -1,0 +1,140 @@
+<div class="view-port clearfix" id="chat">
+  <div class="view bg-white">
+    <div data-init-list-view="ioslist" class="list-view boreded no-top-border">
+      <div class="list-view-group-container">
+      <a type="submit" id="login-btn" class="btn btn-success" href="/users-add">New User</a>
+        <ul>
+          {{#each users}}
+          <li class="chat-user-list clearfix">
+            <a data-view-animation="push-parrallax" data-view-port="#chat" class="" href="/users/{{name}}">
+              <p class="p-l-10 col-xs-height col-middle col-xs-12 text-master">
+                <img src="{{../bolt.protocol}}://{{../bolt.host}}:{{../bolt.port}}/{{displayPic}}" width="20" height="20">
+                {{displayName}} 
+                <a type="submit" id="login-btn" class="btn btn-danger pull-right" onclick="deleteUser('{{name}}', '{{displayName}}')"><i class="fa fa-trash-o"></i></a>
+                {{#if isBlocked}}
+                  <span class="pull-right">
+                    &nbsp;&nbsp;<a type="submit" id="login-btn" class="btn btn-danger" onclick="unblockUser('{{name}}', '{{displayName}}')">Unblock</a>&nbsp;&nbsp;
+                  </span>
+                {{else}}
+                  <span class="pull-right">
+                    &nbsp;&nbsp;<a type="submit" id="login-btn" class="btn btn-danger" onclick="blockUser('{{name}}', '{{displayName}}')"><i class="fa fa-ban"></i> Block</a>&nbsp;&nbsp;
+                  </span>
+                {{/if}}
+                <a type="submit" id="login-btn" class="btn btn-primary pull-right" href="/users/roles/{{name}}">Roles...</a>
+              </p>
+            </a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function deleteUser(username, displayName) {
+  var doJob = function() {
+    $.ajax({
+      url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/users/" + username,
+      type: "DELETE",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+      },
+      success: function(response, status, xhr){
+        if(response.code == 0){
+          swal("User deleted!", displayName + " has been deleted!", "success");
+          window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/users";
+        }
+        else {
+          swal(response.errorUserTitle, response.errorUserMessage, "error");
+        }
+      },
+      error: function(xhr, status, err){
+        alert(xhr.responseText);
+      }
+    });
+  }
+  swal({
+    title: "Delete " + displayName + "?",
+    text: displayName + " will be deleted from this system!",
+    type: "warning",
+    showCancelButton: true,
+    closeOnConfirm: false
+  }, function(isConfirm){
+    if (isConfirm) {
+      doJob();
+    }
+  });
+}
+
+function blockUser(username, displayName) {
+  var doJob = function() {
+    $.ajax({
+      url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/users/" + username,
+      data: { isBlocked: true },
+      type: "PUT",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+      },
+      success: function(response, status, xhr){
+        if(response.code == 0){
+          swal("User blocked!", displayName + " has been blocked!", "success");
+          window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/users";
+        }
+        else {
+          swal(response.errorUserTitle, response.errorUserMessage, "error");
+        }
+      },
+      error: function(xhr, status, err){
+        alert(xhr.responseText);
+      }
+    });
+  }
+  swal({
+    title: "Block " + displayName + "?",
+    text: displayName + " will NOT be able to access this system!",
+    type: "warning",
+    showCancelButton: true,
+    closeOnConfirm: false
+  }, function(isConfirm){
+    if (isConfirm) {
+      doJob();
+    }
+  });
+}
+
+function unblockUser(username, displayName) {
+  var doJob = function() {
+    $.ajax({
+      url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/users/" + username,
+      data: { isBlocked: false },
+      type: "PUT",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+      },
+      success: function(response, status, xhr){
+        if(response.code == 0){
+          swal("User unblocked!", displayName + " has been unblocked!", "success");
+          window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/users";
+        }
+        else {
+          swal(response.errorUserTitle, response.errorUserMessage, "error");
+        }
+      },
+      error: function(xhr, status, err){
+        alert(xhr.responseText);
+      }
+    });
+  }
+  swal({
+    title: "Unblock " + displayName + "?",
+    text: displayName + " will now be able to access this system!",
+    type: "warning",
+    showCancelButton: true,
+    closeOnConfirm: false
+  }, function(isConfirm){
+    if (isConfirm) {
+      doJob();
+    }
+  });
+}
+</script>
