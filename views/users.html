@@ -37,7 +37,7 @@ function deleteUser(username, displayName) {
       url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/users/" + username,
       type: "DELETE",
       beforeSend: function(xhr) {
-        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+        xhr.setRequestHeader('X-Bolt-App-Token', '{{app.token}}');
       },
       success: function(response, status, xhr){
         if(response.code == 0){
@@ -58,7 +58,7 @@ function deleteUser(username, displayName) {
     text: displayName + " will be deleted from this system!",
     type: "warning",
     showCancelButton: true,
-    closeOnConfirm: false
+    closeOnConfirm: true
   }, function(isConfirm){
     if (isConfirm) {
       doJob();
@@ -73,7 +73,7 @@ function blockUser(username, displayName) {
       data: { isBlocked: true },
       type: "PUT",
       beforeSend: function(xhr) {
-        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+        xhr.setRequestHeader('X-Bolt-App-Token', '{{app.token}}');
       },
       success: function(response, status, xhr){
         if(response.code == 0){
@@ -94,7 +94,7 @@ function blockUser(username, displayName) {
     text: displayName + " will NOT be able to access this system!",
     type: "warning",
     showCancelButton: true,
-    closeOnConfirm: false
+    closeOnConfirm: true
   }, function(isConfirm){
     if (isConfirm) {
       doJob();
@@ -109,7 +109,7 @@ function unblockUser(username, displayName) {
       data: { isBlocked: false },
       type: "PUT",
       beforeSend: function(xhr) {
-        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+        xhr.setRequestHeader('X-Bolt-App-Token', '{{app.token}}');
       },
       success: function(response, status, xhr){
         if(response.code == 0){
@@ -130,7 +130,7 @@ function unblockUser(username, displayName) {
     text: displayName + " will now be able to access this system!",
     type: "warning",
     showCancelButton: true,
-    closeOnConfirm: false
+    closeOnConfirm: true
   }, function(isConfirm){
     if (isConfirm) {
       doJob();

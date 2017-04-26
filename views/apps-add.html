@@ -26,7 +26,7 @@ $(document).ready(function(){
           url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/apps/get",
           data: { name: appname },
           type: "POST",
-          headers: {'X-Bolt-Req-Id': '{{bolt.reqid}}'},
+          headers: {'X-Bolt-App-Token': '{{app.token}}'},
           success: function(response, status, xhr){
             if(response.code == 0){
               window.location.href="{{bolt.protocol}}://{{bolt.host}}:{{app.port}}/apps";

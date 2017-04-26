@@ -40,11 +40,11 @@ app.set('view engine', 'html');
 
 //----------initializers
 app.post('/api/ini', function (req, res) { //Bolt will send needed info to this endpoint
-  __app.port = req.body.appPort,
-  __bolt.protocol = req.body.protocol,
+  __app.port = req.body.appPort;
+  __app.token = req.body.appToken;
+  __bolt.protocol = req.body.protocol;
   __bolt.host = req.body.host;
   __bolt.port = req.body.port;
-  __bolt.reqid = req.body.reqid;
 
   res.send();
 });
@@ -53,7 +53,7 @@ app.get('/', function (req, res) {
   if (req.query.user) {
     superagent
       .get(__bolt.protocol + '://' + __bolt.host + ':' + __bolt.port + '/api/users/@current')
-      .set('X-Bolt-Req-Id', __bolt.reqid)
+      .set('X-Bolt-App-Token', __app.token)
       .set('X-Bolt-User-Token', req.query.user)
       .end(function(error, usersResponse){
         //TODO: check error and usersResponse.body.error
@@ -152,12 +152,14 @@ app.get('/apps-sideload/:path', function (req, res) {
       var package = response.body.body;
       //TODO: show package.bolt.dependencies
 
+      var scope = {};
+
       if(package){
         var startup = false;
         if (package.bolt.startup) startup = package.bolt.startup;
         var system = false;
         if (package.bolt.system) system = package.bolt.system;
-        var scope = {
+        scope = {
           app: __app,
           bolt:  __bolt,
           user: __user,

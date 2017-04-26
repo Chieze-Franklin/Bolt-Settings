@@ -57,7 +57,7 @@ $(document).ready(function(){
           data: { name: name, displayName: title, description: description, isAdmin: isadmin },
           type: "POST",
           beforeSend: function(xhr) {
-            xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+            xhr.setRequestHeader('X-Bolt-App-Token', '{{app.token}}');
           },
           success: function(response, status, xhr){
             if(response.code == 0){

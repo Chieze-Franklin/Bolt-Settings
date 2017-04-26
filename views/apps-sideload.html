@@ -44,7 +44,7 @@ $(document).ready(function(){
           url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/apps/reg",
           data: { path: "{{path}}", startup: startup, system: system },
           type: "POST",
-          headers: {'X-Bolt-Req-Id': '{{reqid}}'},
+          headers: {'X-Bolt-App-Token': '{{app.token}}'},
           success: function(response, status, xhr){
             if(response.code == 0){
               sweetAlert("App installed!", response.body.displayName + " has been installed!", "success");

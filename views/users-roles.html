@@ -41,7 +41,7 @@ $(document).ready(function(){
         data: { user: user, role: role },
         type: "POST",
         beforeSend: function(xhr) {
-          xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+          xhr.setRequestHeader('X-Bolt-App-Token', '{{app.token}}');
         },
         success: function(response, status, xhr){
           if(response.code == 0){
@@ -65,7 +65,7 @@ function deleteUserRole(role, displayName) {
       url: "{{bolt.protocol}}://{{bolt.host}}:{{bolt.port}}/api/user-roles?user={{username}}&role=" + role,
       type: "DELETE",
       beforeSend: function(xhr) {
-        xhr.setRequestHeader('X-Bolt-Req-Id', '{{bolt.reqid}}');
+        xhr.setRequestHeader('X-Bolt-App-Token', '{{app.token}}');
       },
       success: function(response, status, xhr){
         if(response.code == 0){
@@ -86,7 +86,7 @@ function deleteUserRole(role, displayName) {
     text: displayName + " will be deleted from this user's list of roles!",
     type: "warning",
     showCancelButton: true,
-    closeOnConfirm: false
+    closeOnConfirm: true
   }, function(isConfirm){
     if (isConfirm) {
       doJob();

@@ -1,6 +1,6 @@
 {
   "name": "bolt-settings",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Default settings app for Bolt",
   "main": "server.js",
   "repository": {
@@ -21,7 +21,6 @@
     "settings",
     "bolt-settings"
   ],
-
   "bolt": {
     "displayName": "Settings",
     "main": "bolt-server.js",
@@ -30,15 +29,22 @@
     "install": "/api/install",
     "startup": true,
     "system": true,
-    "tags": [ "main", "settings" ],
-    "checks": [ "package.json" ],
+    "tags": [
+      "main",
+      "settings"
+    ],
+    "checks": [
+      "package.json"
+    ],
     "files": {
-        "icon": "ico/icon.png",
-        "favicon": "ico/favicon.ico"
+      "icon": "ico/icon.png",
+      "favicon": "ico/favicon.ico"
     },
-    "public": ["ico"],
+    "public": [
+      "ico"
+    ],
     "extensions": {
-        "/settings": "/"
+      "/settings": "/"
     },
     "dependencies": {
       "bolt-ui-pages": "*",
